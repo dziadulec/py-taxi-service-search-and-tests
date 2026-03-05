@@ -58,5 +58,11 @@ class DriverSearchForm(forms.ModelForm):
         fields = ["username"]
 
 
+class CarSearchForm(forms.ModelForm):
+    class Meta:
+        model = Car
+        fields = ["model"]
+
+
 
 
