@@ -60,11 +60,19 @@ class ModelsTest(TestCase):
     def test_driver_get_absolute_url(self):
         driver = Driver.objects.create(
             username="Marianos",
+
         )
         expected_url = reverse("taxi:driver-detail", kwargs={"pk": driver.pk})
         self.assertEqual(driver.get_absolute_url(), expected_url)
 
     def test_driver_license_number_is_unique_false(self):
+
+        Driver.objects.create(
+            username="Mariano",
+            last_name="Dziad",
+            first_name="Marek",
+            license_number="ABC12347"
+        )
 
         with self.assertRaises(IntegrityError):
             Driver.objects.create(
