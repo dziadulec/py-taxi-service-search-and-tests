@@ -105,16 +105,11 @@ class IndexViewTests(TestCase):
     def test_index_context(self):
         self.client.login(username="testuser", password="test12345")
 
-        manufacturer = Manufacturer.objects.create(
-            name="Dacia",
-            country="Romania"
-        )
-        Car.objects.create(model="Duster", manufacturer=manufacturer)
         res = self.client.get(reverse("taxi:index"))
 
         self.assertEqual(res.context["num_drivers"], 12)
-        self.assertEqual(res.context["num_cars"], 17)
-        self.assertEqual(res.context["num_manufacturers"], 15)
+        self.assertEqual(res.context["num_cars"], 16)
+        self.assertEqual(res.context["num_manufacturers"], 14)
 
 
 class ManufacturerListViewTest(TestCase):
