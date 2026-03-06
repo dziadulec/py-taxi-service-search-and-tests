@@ -68,7 +68,3 @@ class ManufacturerSearchForm(forms.ModelForm):
     class Meta:
         model = Manufacturer
         fields = ["name"]
-
-
-
-

@@ -6,8 +6,13 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Driver, Car, Manufacturer
-from .forms import DriverCreationForm, DriverLicenseUpdateForm, CarForm, DriverSearchForm, CarSearchForm, \
-    ManufacturerSearchForm
+from .forms import (
+    DriverCreationForm,
+    DriverLicenseUpdateForm,
+    CarForm,
+    DriverSearchForm,
+    CarSearchForm,
+    ManufacturerSearchForm)
 
 
 @login_required
@@ -38,7 +43,7 @@ class ManufacturerListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 5
 
     def get_context_data(
-        self, *, object_list = ..., **kwargs
+        self, *, object_list=..., **kwargs
     ):
         context = super(ManufacturerListView, self).get_context_data(**kwargs)
         context["manufacturer_search"] = ManufacturerSearchForm()
@@ -76,7 +81,7 @@ class CarListView(LoginRequiredMixin, generic.ListView):
     queryset = Car.objects.select_related("manufacturer")
 
     def get_context_data(
-        self, *, object_list = ..., **kwargs
+        self, *, object_list=..., **kwargs
     ):
         context = super(CarListView, self).get_context_data(**kwargs)
         context["car_search"] = CarSearchForm()
@@ -117,7 +122,7 @@ class DriverListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 5
 
     def get_context_data(
-        self, *, object_list = ..., **kwargs
+        self, *, object_list=..., **kwargs
     ):
         context = super(DriverListView, self).get_context_data(**kwargs)
         context["driver_search"] = DriverSearchForm()
@@ -130,7 +135,6 @@ class DriverListView(LoginRequiredMixin, generic.ListView):
         if username:
             return Driver.objects.filter(username__icontains=username)
         return queryset
-
 
 
 class DriverDetailView(LoginRequiredMixin, generic.DetailView):

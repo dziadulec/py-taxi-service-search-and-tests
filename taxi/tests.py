@@ -15,18 +15,28 @@ from taxi.views import ManufacturerListView, DriverListView, CarListView
 Login = "admin.user"
 Password = "1qazcde3"
 
+
 class ModelsTest(TestCase):
 
     def test_manufacturer_str(self):
-        manufacturer = Manufacturer.objects.create(name="Dacia", country="Romania")
+        manufacturer = Manufacturer.objects.create(
+            name="Dacia",
+            country="Romania"
+        )
         self.assertEqual(str(manufacturer), "Dacia Romania")
 
     def test_manufacturer_meta(self):
         self.assertEqual(Manufacturer._meta.ordering, ["name"])
 
-    def test_Car_str(self):
-        manufacturer = Manufacturer.objects.create(name="Dacia", country="Romania")
-        car = Car.objects.create(model="Duster", manufacturer=manufacturer)
+    def test_car_str(self):
+        manufacturer = Manufacturer.objects.create(
+            name="Dacia",
+            country="Romania"
+        )
+        car = Car.objects.create(
+            model="Duster",
+            manufacturer=manufacturer
+        )
         self.assertEqual(str(car), "Duster")
 
     def test_driver_str(self):
@@ -38,8 +48,14 @@ class ModelsTest(TestCase):
         self.assertEqual(str(driver), "Marianos (Marek Dziad)")
 
     def test_driver_meta(self):
-        self.assertEqual(Driver._meta.verbose_name, "driver")
-        self.assertEqual(Driver._meta.verbose_name_plural, "drivers")
+        self.assertEqual(
+            Driver._meta.verbose_name,
+            "driver"
+        )
+        self.assertEqual(
+            Driver._meta.verbose_name_plural,
+            "drivers"
+        )
 
     def test_driver_get_absolute_url(self):
         driver = Driver.objects.create(
@@ -50,22 +66,13 @@ class ModelsTest(TestCase):
 
     def test_driver_license_number_is_unique_false(self):
 
-        driver_one = Driver.objects.create(
-            username="Sariano",
-            last_name="Dziad",
-            first_name="Marek",
-            license_number="ABC12347"
-        )
-
         with self.assertRaises(IntegrityError):
             Driver.objects.create(
-            username="Mariano",
-            last_name="Dziad",
-            first_name="Marek",
-            license_number="ABC12347"
-
-        )
-
+                username="Mariano",
+                last_name="Dziad",
+                first_name="Marek",
+                license_number="ABC12347"
+            )
 # ---------------------------------------------------------
 # VIEVs TESTS
 # ---------------------------------------------------------
@@ -78,33 +85,33 @@ class IndexViewTests(TestCase):
             password="test12345"
         )
 
+    def test_index_logout(self):
+        res = self.client.get(reverse("taxi:index"))
+        self.assertEqual(res.status_code, 302)
 
-    def test_Index_logout(self):
-        response = self.client.get(reverse("taxi:index"))
-        self.assertEqual(response.status_code, 302)
-
-
-    def test_Index_login(self):
+    def test_index_login(self):
         self.client.login(username="testuser", password="test12345")
-        response = self.client.get(reverse("taxi:index"))
-        self.assertEqual(response.status_code, 200)
-
+        res = self.client.get(reverse("taxi:index"))
+        self.assertEqual(res.status_code, 200)
 
     def test_index_context(self):
         self.client.login(username="testuser", password="test12345")
 
-        manufacturer =  Manufacturer.objects.create(name="Dacia", country="Romania")
+        manufacturer = Manufacturer.objects.create(
+            name="Dacia",
+            country="Romania"
+        )
         Car.objects.create(model="Duster", manufacturer=manufacturer)
-        response = self.client.get(reverse("taxi:index"))
+        res = self.client.get(reverse("taxi:index"))
 
-        self.assertEqual(response.context["num_drivers"],12)
-        self.assertEqual(response.context["num_cars"], 17)
-        self.assertEqual(response.context["num_manufacturers"], 15)
-
+        self.assertEqual(res.context["num_drivers"], 12)
+        self.assertEqual(res.context["num_cars"], 17)
+        self.assertEqual(res.context["num_manufacturers"], 15)
 
 
 class ManufacturerListViewTest(TestCase):
     TestCase.fixtures = ["taxi_service_db_data.json"]
+
     def setUp(self):
         self.user = Driver.objects.create_user(
             username="testuser",
@@ -112,42 +119,43 @@ class ManufacturerListViewTest(TestCase):
         )
 
     def test_manufacturer_list_view_logaut(self):
-        response = self.client.get(reverse("taxi:manufacturer-list"))
-        self.assertEqual(response.status_code, 302)
-
+        res = self.client.get(reverse("taxi:manufacturer-list"))
+        self.assertEqual(res.status_code, 302)
 
     def test_manufacturer_list_view_login(self):
         self.client.login(username="testuser", password="test12345")
 
-        response = self.client.get(reverse("taxi:manufacturer-list"))
-        self.assertEqual(response.status_code, 200)
+        res = self.client.get(reverse("taxi:manufacturer-list"))
+        self.assertEqual(res.status_code, 200)
 
     def test_manufacturer_list_view_paginate(self):
 
-        paginate_test =  ManufacturerListView.paginate_by
+        paginate_test = ManufacturerListView.paginate_by
         self.assertEqual(paginate_test, 5)
 
     def test_manufacturer_list_view_search(self):
         self.client.login(username="testuser", password="test12345")
 
         url = reverse("taxi:manufacturer-list") + "?name=BAIC"
-        response = self.client.get(url)
-        
-        self.assertTrue(len(response.context['manufacturer_list']) == 1)
-        self.assertEqual(response.context['manufacturer_list'][0].name, "BAIC")
+        res = self.client.get(url)
+
+        self.assertTrue(len(res.context["manufacturer_list"]) == 1)
+        self.assertEqual(res.context["manufacturer_list"][0].name,
+                         "BAIC"
+                         )
 
 
 class DriverListViewTestCase(TestCase):
-    fixtures  = ["taxi_service_db_data.json"]
+    fixtures = ["taxi_service_db_data.json"]
 
     def test_driver_list_view_if_logaut(self):
-        response = self.client.get(reverse("taxi:driver-list"))
-        self.assertEqual(response.status_code, 302)
+        res = self.client.get(reverse("taxi:driver-list"))
+        self.assertEqual(res.status_code, 302)
 
     def test_driver_list_view_if_login(self):
         self.client.login(username=Login, password=Password)
-        response = self.client.get(reverse("taxi:driver-list"))
-        self.assertEqual(response.status_code, 200)
+        res = self.client.get(reverse("taxi:driver-list"))
+        self.assertEqual(res.status_code, 200)
 
     def test_driver_list_view_paginate(self):
         paginate_test = DriverListView.paginate_by
@@ -157,10 +165,12 @@ class DriverListViewTestCase(TestCase):
         self.client.login(username=Login, password=Password)
 
         url = reverse("taxi:driver-list") + "?username=jonathan.byers"
-        response = self.client.get(url)
+        res = self.client.get(url)
 
-        self.assertEqual(response.context["driver_list"].count(), 1)
-        self.assertEqual(response.context["driver_list"][0].username, "jonathan.byers")
+        self.assertEqual(res.context["driver_list"].count(), 1)
+        self.assertEqual(res.context["driver_list"][0].username,
+                         "jonathan.byers"
+                         )
 
 
 class CarListViewTestCase(TestCase):
@@ -168,13 +178,13 @@ class CarListViewTestCase(TestCase):
     fixtures = ["taxi_service_db_data.json"]
 
     def test_car_list_view_if_logaut(self):
-        response = self.client.get(reverse("taxi:car-list"))
-        self.assertEqual(response.status_code, 302)
+        res = self.client.get(reverse("taxi:car-list"))
+        self.assertEqual(res.status_code, 302)
 
     def test_car_list_view_if_login(self):
         self.client.login(username=Login, password=Password)
-        response = self.client.get(reverse("taxi:car-list"))
-        self.assertEqual(response.status_code, 200)
+        res = self.client.get(reverse("taxi:car-list"))
+        self.assertEqual(res.status_code, 200)
 
     def test_car_list_view_paginate(self):
         paginate_test = CarListView.paginate_by
@@ -184,16 +194,15 @@ class CarListViewTestCase(TestCase):
         self.client.login(username=Login, password=Password)
         url = reverse("taxi:car-list") + "?model=Toyota"
 
-        response = self.client.get(url)
+        res = self.client.get(url)
 
-        self.assertTrue(len(response.context['car_list']) == 1)
-        self.assertEqual(response.context['car_list'][0].model, "Toyota Yaris")
-
-
+        self.assertTrue(len(res.context["car_list"]) == 1)
+        self.assertEqual(res.context["car_list"][0].model, "Toyota Yaris")
 
 # ---------------------------------------------------------
 # FORMs TESTS
 # ---------------------------------------------------------
+
 
 class DriverSearchFormTest(TestCase):
     def test_form_valid(self):
@@ -201,22 +210,18 @@ class DriverSearchFormTest(TestCase):
 
         self.assertTrue(form.is_valid())
 
+
 class CarSearchFormTest(TestCase):
+
     def test_form_valid(self):
         form = CarSearchForm(data={"model": "Sandero"})
 
         self.assertTrue(form.is_valid())
 
+
 class ManufacturerSearchFormTest(TestCase):
+
     def test_form_valid(self):
         form = ManufacturerSearchForm(data={"name": "Romunia"})
 
         self.assertTrue(form.is_valid())
-
-
-
-
-
-
-
-
