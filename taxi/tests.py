@@ -65,3 +65,32 @@ class ModelsTest(TestCase):
 # ---------------------------------------------------------
 
 
+class IndexViewTests(TestCase):
+    def setUp(self):
+        self.user = Driver.objects.create_user(
+            username="testuser",
+            password="test12345"
+        )
+
+
+    def test_Index_logout(self):
+        response = self.client.get(reverse("taxi:index"))
+        self.assertEqual(response.status_code, 302)
+
+
+    def test_Index_login(self):
+        self.client.login(username="testuser", password="test12345")
+        response = self.client.get(reverse("taxi:index"))
+        self.assertEqual(response.status_code, 200)
+
+
+    def test_index_context(self):
+        self.client.login(username="testuser", password="test12345")
+
+        manufacturer =  Manufacturer.objects.create(name="Dacia", country="Romania")
+        Car.objects.create(model="Duster", manufacturer=manufacturer)
+        response = self.client.get(reverse("taxi:index"))
+
+        self.assertEqual(response.context["num_drivers"],12)
+        self.assertEqual(response.context["num_cars"], 17)
+        self.assertEqual(response.context["num_manufacturers"], 15)
