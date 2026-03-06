@@ -73,6 +73,7 @@ class ModelsTest(TestCase):
 
 class IndexViewTests(TestCase):
     fixtures = ["taxi_service_db_data.json"]
+
     def setUp(self):
         self.user = Driver.objects.create_user(
             username="testuser",
